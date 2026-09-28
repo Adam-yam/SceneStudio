@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
+<meta name="description" content="사진으로 만드는 음악 포스터와 포커스 모션. SCENE Studio">
+<title>SCENE - Studio</title>
+<link rel="icon" href="./favicon.ico?v=20260928" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32.png?v=20260928">
+<link rel="icon" type="image/png" sizes="16x16" href="./images/favicon-16.png?v=20260928">
+<link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon.png?v=20260928">
+<link rel="manifest" href="./site.webmanifest?v=20260928">
+<link rel="stylesheet" href="./styles.css?v=20260928">
+<script src="./vendor/gif.js" defer></script>
+<script src="./camera-ui.js?v=20260928" defer></script>
+<script src="./app.js?v=20260928" defer></script>
+</head>
+<body>
+<header>
+  <a class="brand" href="./" aria-label="SCENE Studio 홈"><img src="./images/icon.png?v=20260928" width="30" height="30" alt="">SCENE<span>STUDIO</span></a>
+  <div class="header-right">
+    <span class="private">사진은 이 기기에서만 처리됩니다</span>
+    <button id="share" class="quiet">공유</button>
+  </div>
+</header>
+
+<main>
+<aside class="editor">
+
+  <div class="tabs" role="tablist" aria-label="작업 종류">
+    <button id="musicTab" role="tab" aria-selected="true" aria-controls="musicPanel" data-mode="music">뮤직 포스터</button>
+    <button id="focusTab" role="tab" aria-selected="false" aria-controls="focusPanel" data-mode="focus">포커스 모션</button>
+    <button id="lifecutTab" role="tab" aria-selected="false" aria-controls="lifecutPanel" data-mode="lifecut">인생네컷</button>
+  </div>
+
+  <div id="sharedPhotoSection">
+  <section>
+    <div class="section-title">
+      <h2><i>1</i>사진</h2>
+      <button id="clear" class="text-button" disabled>지우기</button>
+    </div>
+    <label class="upload" id="drop">
+      <input id="photo" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif">
+      <span class="upload-icon">
+        <svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M12 4l-4 4M12 4l4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+        <svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg>
+      </span>
+      <strong id="fileLabel">사진 선택</strong>
+      <small>여기에 끌어놓거나 붙여넣기</small>
+    </label>
+    <p class="hint">JPG · PNG · WebP · AVIF / 최대 25 MB</p>
+    <details>
+      <summary>사진 위치 조정</summary>
+      <label>확대 <input id="zoom" type="range" min="1" max="2.5" step="0.01" value="1"></label>
+      <label>가로 위치 <input id="panX" type="range" min="-1" max="1" step="0.01" value="0"></label>
+      <label>세로 위치 <input id="panY" type="range" min="-1" max="1" step="0.01" value="0"></label>
+    </details>
+  </section>
+  </div>
+
+  <div id="musicPanel" role="tabpanel" aria-labelledby="musicTab">
+    <section>
+      <h2><i>2</i>트랙 정보</h2>
+      <label>곡명<input id="title" type="text" maxlength="90" placeholder="노래의 이름"></label>
+      <label>아티스트<input id="artist" type="text" maxlength="90" placeholder="아티스트의 이름"></label>
+      <div class="pair">
+        <label>현재 시간<input id="elapsed" type="text" value="1:24" pattern="[0-9]{1,2}:[0-5][0-9]"></label>
+        <label>전체 시간<input id="duration" type="text" value="3:48" pattern="[0-9]{1,2}:[0-5][0-9]"></label>
+      </div>
+    </section>
+    <section>
+      <div class="section-title">
+        <h2><i>3</i>색상</h2>
+        <button id="eyedropper" class="text-button" aria-pressed="false" disabled>스포이트</button>
+      </div>
+      <div id="palette" class="palette" aria-label="사진에서 추출한 색상"></div>
+      <p id="pickHint" class="hint">사진을 넣으면 다섯 가지 색을 추출합니다.</p>
+      <div class="color-line">
+        <label for="background">배경색</label>
+        <input id="background" type="color" value="#ffffff">
+        <button id="white" class="text-button">흰색</button>
+      </div>
+      <label class="check"><input id="showPalette" type="checkbox" checked> 포스터에 팔레트 표시</label>
+    </section>
+    <section>
+      <h2><i>4</i>출력 크기</h2>
+      <label class="sr-only" for="size">출력 크기</label>
+      <select id="size">
+        <option value="1080,1920">기본 세로 · 1080 × 1920</option>
+        <option value="1320,2868">iPhone · 1320 × 2868</option>
+        <option value="1080,2340">Android FHD+ · 1080 × 2340</option>
+        <option value="1440,3120">Android WQHD+ · 1440 × 3120</option>
+      </select>
+    </section>
+  </div>
+
+  <div id="focusPanel" role="tabpanel" aria-labelledby="focusTab" hidden>
+    <section>
+      <h2><i>2</i>촬영 스타일</h2>
+      <label>카메라
+        <select id="camera">
+          <option value="clean">iPhone · iOS 클래식</option>
+          <option value="grid">Galaxy · One UI</option>
+          <option value="pro">미러리스 · 라이브 뷰</option>
+          <option value="vhs">캠코더 · Handycam</option>
+          <option value="parallax">패럴랙스 · 줌</option>
+          <option value="lightstick">라이트스틱 · 보케</option>
+        </select>
+      </label>
+      <label>방향
+        <select id="orientation">
+          <option value="portrait">세로 · 9:16</option>
+          <option value="landscape">가로 · 16:9</option>
+        </select>
+      </label>
+    </section>
+    <section>
+      <h2><i>3</i>자막</h2>
+      <label>사진 위의 한마디<textarea id="caption" rows="2" maxlength="120" placeholder="원하는 문구"></textarea></label>
+      <div class="color-line">
+        <label for="captionColor">자막 색상</label>
+        <input id="captionColor" type="color" value="#ffffff">
+      </div>
+      <label class="check"><input id="italic" type="checkbox"> 기울임</label>
+    </section>
+    <section>
+      <h2><i>4</i>모션 & 저장</h2>
+      <label class="check"><input id="loop" type="checkbox" checked> 반복 재생</label>
+      <label>GIF 크기
+        <select id="quality">
+          <option value="360">작게 · 긴 변 360 px</option>
+          <option value="540">보통 · 긴 변 540 px</option>
+          <option value="720" selected>크게 · 긴 변 720 px</option>
+          <option value="1080">최고 화질 · 긴 변 1080 px</option>
+          <option value="max">최대 크기 · 긴 변 1920 px</option>
+        </select>
+      </label>
+      <p class="hint">3.6초 · 15 fps · 화질을 높일수록 GIF 생성 시간이 길어지고 파일 용량도 커집니다 · PNG는 긴 변 1920 px</p>
+    </section>
+  </div>
+
+  <div id="lifecutPanel" role="tabpanel" aria-labelledby="lifecutTab" hidden>
+    <section>
+      <div class="section-title">
+        <h2><i>1</i>사진 4장</h2>
+        <button id="lifecutClear" class="text-button" disabled>모두 지우기</button>
+      </div>
+      <div class="lifecut-slots">
+        <label class="upload small" data-slot="0"><input class="lifecutInput" data-index="0" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif"><span class="upload-icon"><svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M12 4l-4 4M12 4l4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg></span><small>1</small></label>
+        <label class="upload small" data-slot="1"><input class="lifecutInput" data-index="1" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif"><span class="upload-icon"><svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M12 4l-4 4M12 4l4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg></span><small>2</small></label>
+        <label class="upload small" data-slot="2"><input class="lifecutInput" data-index="2" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif"><span class="upload-icon"><svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M12 4l-4 4M12 4l4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg></span><small>3</small></label>
+        <label class="upload small" data-slot="3"><input class="lifecutInput" data-index="3" type="file" accept="image/jpeg,image/png,image/webp,image/avif,image/gif"><span class="upload-icon"><svg class="icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4M12 4l-4 4M12 4l4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12l5 5L20 6"/></svg></span><small>4</small></label>
+      </div>
+      <p class="hint">JPG · PNG · WebP · AVIF / 슬롯당 최대 25 MB</p>
+      <details id="lifecutAdjust">
+        <summary>사진 위치 조정</summary>
+        <div class="slot-picker" role="group" aria-label="조정할 사진 선택">
+          <button type="button" class="slot-pick" data-slot="0" aria-pressed="true" disabled>1</button>
+          <button type="button" class="slot-pick" data-slot="1" aria-pressed="false" disabled>2</button>
+          <button type="button" class="slot-pick" data-slot="2" aria-pressed="false" disabled>3</button>
+          <button type="button" class="slot-pick" data-slot="3" aria-pressed="false" disabled>4</button>
+        </div>
+        <label>확대 <input id="lifecutZoom" type="range" min="1" max="2.5" step="0.01" value="1"></label>
+        <label>가로 위치 <input id="lifecutPanX" type="range" min="-1" max="1" step="0.01" value="0"></label>
+        <label>세로 위치 <input id="lifecutPanY" type="range" min="-1" max="1" step="0.01" value="0"></label>
+      </details>
+    </section>
+    <section>
+      <h2><i>2</i>프레임</h2>
+      <div class="color-line">
+        <label for="lifecutFrame">프레임 색상</label>
+        <input id="lifecutFrame" type="color" value="#ffffff">
+        <button id="lifecutWhite" class="text-button">흰색</button>
+      </div>
+      <label class="check"><input id="lifecutDate" type="checkbox" checked> 촬영 날짜 표시</label>
+    </section>
+    <section>
+      <h2><i>3</i>한마디</h2>
+      <label>하단 문구<input id="lifecutCaption" type="text" maxlength="40" placeholder="원하는 문구"></label>
+    </section>
+  </div>
+
+  <footer class="editor-footer">SCENE / MAKE IT YOURS</footer>
+</aside>
+
+<div class="workspace">
+  <div class="workspace-top">
+    <span class="eyebrow">미리보기</span>
+    <span id="dimensions">1080 × 1920</span>
+  </div>
+  <div class="preview-area" id="previewArea">
+    <div id="empty">
+      <span class="empty-mark" aria-hidden="true">
+        <img src="./images/icon.png?v=20260928" width="72" height="72" alt="">
+      </span>
+      <h2>사진 추가</h2>
+      <p class="hint">끌어놓거나 붙여넣어도 됩니다</p>
+      <button id="choose" class="primary">사진 선택</button>
+    </div>
+    <canvas id="preview" hidden aria-label="결과물 미리보기"></canvas>
+  </div>
+  <div class="preview-bottom">
+    <button id="replay" class="quiet" hidden disabled>↻ 다시 재생</button>
+  </div>
+  <div id="motionControls" class="motion-controls" hidden>
+    <button id="playPause" class="quiet" disabled>▶ 재생</button>
+    <input id="timeline" type="range" min="0" max="3600" step="1" value="0" aria-label="포커스 모션 재생 위치" disabled>
+    <span id="previewTime">0.0 / 3.6초</span>
+  </div>
+  <div class="export-bar">
+    <p id="status" role="status" aria-live="polite">사진을 선택하면 저장할 수 있습니다.</p>
+    <div class="export-actions">
+      <button id="png" class="primary" disabled>PNG 저장 <span>↓</span></button>
+      <button id="gif" class="primary" hidden disabled>GIF 저장 <span>↓</span></button>
+      <button id="cancel" hidden>취소</button>
+    </div>
+    <progress id="progress" max="100" value="0" hidden aria-label="GIF 생성 진행률"></progress>
+    <a id="download" hidden>파일 다시 다운로드</a>
+  </div>
+</div>
+</main>
+</body>
+</html>
